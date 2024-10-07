@@ -10,8 +10,8 @@ function create_ota_update() {
     local kernel="${BINARIES_DIR}/kernel.img"
     local rootfs="${BINARIES_DIR}/rootfs.squashfs"
     local spl="${BINARIES_DIR}/spl.img"
-    local key="/build/key.pem"
-    local cert="/build/cert.pem"
+    local key="${BR2_EXTERNAL_HASSOS_PATH}/../key.pem"
+    local cert="${BR2_EXTERNAL_HASSOS_PATH}/../cert.pem"
     local keyring="${TARGET_DIR}/etc/rauc/keyring.pem"
 
     # Skip if no dev key is arround

@@ -3,8 +3,8 @@ set -e
 
 
 function prepare_rauc_signing() {
-    local key="/build/key.pem"
-    local cert="/build/cert.pem"
+    local key="${BR2_EXTERNAL_HASSOS_PATH}/../key.pem"
+    local cert="${BR2_EXTERNAL_HASSOS_PATH}/../cert.pem"
 
     if [ ! -f "${key}" ]; then
         echo "Generating a self-signed certificate for development"
@@ -30,7 +30,7 @@ function write_rauc_config() {
 
 
 function install_rauc_certs() {
-    local cert="/build/cert.pem"
+    local cert="${BR2_EXTERNAL_HASSOS_PATH}/../cert.pem"
 
     if [ "${DEPLOYMENT}" == "development" ]; then
         # Contains development and release certificate
