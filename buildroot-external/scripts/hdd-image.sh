@@ -14,7 +14,7 @@ BOOTSTATE_SIZE=8M
 SYSTEM_SIZE=256M
 KERNEL_SIZE=24M
 OVERLAY_SIZE=96M
-DATA_SIZE=1280M
+DATA_SIZE=3G
 
 
 function size2sectors() {
@@ -139,7 +139,7 @@ function _create_disk_gpt() {
     local data_img="$(path_data_img)"
     local kernel_img="$(path_kernel_img)"
     local hdd_img="$(hassos_image_name img)"
-    local hdd_count=${DISK_SIZE:-2}
+    local hdd_count=${DISK_SIZE:-4}
 
     local boot_offset=0
     local rootfs_offset=0
@@ -222,7 +222,7 @@ function _create_disk_mbr() {
     local data_img="$(path_data_img)"
     local kernel_img="$(path_kernel_img)"
     local hdd_img="$(hassos_image_name img)"
-    local hdd_count=${DISK_SIZE:-2}
+    local hdd_count=${DISK_SIZE:-4}
     local disk_layout="${BINARIES_DIR}/disk.layout"
 
     # All boards with MBR disk layout have SPL
