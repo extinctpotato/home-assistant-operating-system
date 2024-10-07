@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC1090,SC1091
-set -e
+set -xe
 
 SCRIPT_DIR=${BR2_EXTERNAL_HASSOS_PATH}/scripts
 BOARD_DIR=${2}
