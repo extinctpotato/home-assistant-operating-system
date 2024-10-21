@@ -100,6 +100,8 @@ if [ -z "${SUPERVISOR_CONTAINER_ID}" ]; then
         -v /run/supervisor:/run/os:rw \
         -v /run/udev:/run/udev:ro \
         -v /etc/machine-id:/etc/machine-id:ro \
+        -v /usr/share/ca-certificates:/usr/share/ca-certificates:ro \
+        -v /etc/ssl/certs:/etc/ssl/certs:ro \
         -v ${SUPERVISOR_DATA}:/data:rw,slave \
         -e SUPERVISOR_SHARE=${SUPERVISOR_DATA} \
         -e SUPERVISOR_NAME=hassio_supervisor \
