@@ -62,6 +62,7 @@ if [ -z "${SUPERVISOR_CONTAINER_ID}" ]; then
         --name hassio_supervisor \
         --privileged --security-opt apparmor="hassio-supervisor" \
         --oom-score-adj=-300 \
+        --add-host=version.home-assistant.io:host-gateway \
         -v /run/docker.sock:/run/docker.sock:rw \
         -v /run/containerd/containerd.sock:/run/containerd/containerd.sock:rw \
         -v /run/systemd-journal-gatewayd.sock:/run/systemd-journal-gatewayd.sock:rw \
