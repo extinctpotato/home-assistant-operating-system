@@ -1,0 +1,13 @@
+[Unit]
+Description=HassOS ZHA Quirks
+Wants=mnt-data.mount
+After=mnt-data.mount
+
+[Mount]
+What=/usr/lib/zhaquirks/
+Where=/mnt/data/supervisor/homeassistant/zhaquirks
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target
