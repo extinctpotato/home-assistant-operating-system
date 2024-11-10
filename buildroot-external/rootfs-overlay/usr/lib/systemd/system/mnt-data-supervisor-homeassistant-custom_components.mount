@@ -1,0 +1,13 @@
+[Unit]
+Description=HassOS Custom Components 
+Wants=mnt-data.mount
+After=mnt-data.mount
+
+[Mount]
+What=/usr/lib/custom_components/
+Where=/mnt/data/supervisor/homeassistant/custom_components
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target
