@@ -1,0 +1,117 @@
+From 6aeffa384050372c98eb0b316d6c1ff1986f753f Mon Sep 17 00:00:00 2001
+From: Adam Olech <me@aole.ch>
+Date: Mon, 11 Nov 2024 03:24:21 +0100
+Subject: [PATCH] Allow passing keyword arguments
+
+---
+ custom_components/zha_toolkit/__init__.py   | 1 +
+ custom_components/zha_toolkit/params.py     | 2 ++
+ custom_components/zha_toolkit/services.yaml | 7 +++++++
+ custom_components/zha_toolkit/utils.py      | 4 ++++
+ custom_components/zha_toolkit/zcl_cmd.py    | 4 +++-
+ 5 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/custom_components/zha_toolkit/__init__.py b/custom_components/zha_toolkit/__init__.py
+index 6a59ac4..c86e7d2 100644
+--- a/custom_components/zha_toolkit/__init__.py
++++ b/custom_components/zha_toolkit/__init__.py
+@@ -508,6 +508,7 @@ SERVICE_SCHEMAS = {
+             vol.Optional(P.ENDPOINT): vol.Any(cv.byte, [cv.byte]),
+             vol.Optional(P.CLUSTER): vol.Range(0, 0xFFFF),
+             vol.Optional(P.MANF): vol.Range(0, 0xFFFF),
++            vol.Optional(P.KWARGS): dict,
+             vol.Optional(P.ARGS): vol.Any(
+                 int, list, cv.string
+             ),  # Arguments to command
+diff --git a/custom_components/zha_toolkit/params.py b/custom_components/zha_toolkit/params.py
+index 3969f40..690d2d6 100644
+--- a/custom_components/zha_toolkit/params.py
++++ b/custom_components/zha_toolkit/params.py
+@@ -20,6 +20,7 @@ class USER_PARAMS_consts:  # pylint: disable=too-few-public-methods
+     TRIES = "tries"
+     EXPECT_REPLY = "expect_reply"
+     ARGS = "args"
++    KWARGS = "kwargs"
+     STATE_ID = "state_id"
+     STATE_ATTR = "state_attr"
+     ALLOW_CREATE = "allow_create"
+@@ -105,6 +106,7 @@ class INTERNAL_PARAMS_consts:  # pylint: disable=too-few-public-methods
+     __slots__ = ()
+     ALLOW_CREATE = "allow_create"
+     ARGS = "args"
++    KWARGS = "kwargs"
+     ATTR_ID = "attr_id"
+     ATTR_TYPE = "attr_type"
+     ATTR_VAL = "attr_val"
+diff --git a/custom_components/zha_toolkit/services.yaml b/custom_components/zha_toolkit/services.yaml
+index a68627e..e62a828 100644
+--- a/custom_components/zha_toolkit/services.yaml
++++ b/custom_components/zha_toolkit/services.yaml
+@@ -2399,6 +2399,13 @@ zcl_cmd:
+       example: [1, abcd, 3]
+       selector:
+         text:
++    kwargs:
++      name: Command Keyword Arguments
++      description:
++        Keyword arguments for command
++      example: {"code": "cool_code"}
++      selector:
++        text:
+     tries:
+       name: Tries
+       description: Number of times the zigbee packet should be attempted
+diff --git a/custom_components/zha_toolkit/utils.py b/custom_components/zha_toolkit/utils.py
+index 866ccc0..7b09f2e 100644
+--- a/custom_components/zha_toolkit/utils.py
++++ b/custom_components/zha_toolkit/utils.py
+@@ -873,6 +873,7 @@ def extractParams(  # noqa: C901
+         p.TRIES: 1,
+         p.EXPECT_REPLY: True,
+         p.ARGS: [],
++        p.KWARGS: {},
+         p.STATE_ID: None,
+         p.STATE_ATTR: None,
+         p.STATE_VALUE_TEMPLATE: None,
+@@ -978,6 +979,9 @@ def extractParams(  # noqa: C901
+                 LOGGER.debug("cmd converted arg %s", lval)
+         params[p.ARGS] = cmd_args
+ 
++    if P.KWARGS in rawParams:
++        params[P.KWARGS] = rawParams[P.KWARGS]
++
+     if P.MIN_INTRVL in rawParams:
+         params[p.MIN_INTERVAL] = str2int(rawParams[P.MIN_INTRVL])
+     if P.MAX_INTRVL in rawParams:
+diff --git a/custom_components/zha_toolkit/zcl_cmd.py b/custom_components/zha_toolkit/zcl_cmd.py
+index eca977d..76015f8 100644
+--- a/custom_components/zha_toolkit/zcl_cmd.py
++++ b/custom_components/zha_toolkit/zcl_cmd.py
+@@ -52,6 +52,7 @@ async def zcl_cmd(app, listener, ieee, cmd, data, service, params, event_data):
+     expect_reply = params[p.EXPECT_REPLY]
+ 
+     cmd_args = params[p.ARGS]
++    kw_args = params[p.KWARGS]
+ 
+     # Direction 0 = Client to Server, as in protocol bit
+     is_in_cluster = dir_int == 0
+@@ -120,6 +121,7 @@ async def zcl_cmd(app, listener, ieee, cmd, data, service, params, event_data):
+                 manufacturer=manf,
+                 expect_reply=expect_reply,
+                 tries=tries,
++                **kw_args
+             )
+         else:
+             if cluster_id not in endpoint.out_clusters:
+@@ -134,7 +136,7 @@ async def zcl_cmd(app, listener, ieee, cmd, data, service, params, event_data):
+ 
+             # Note: client_command not tested
+             event_data["cmd_reply"] = await cluster.client_command(
+-                cmd_id, *cmd_args, manufacturer=manf
++                cmd_id, *cmd_args, manufacturer=manf, **kw_args
+             )
+     except Exception as e:
+         caught_e = e
+-- 
+2.47.0
+
